@@ -1,0 +1,981 @@
+{
+	"info": {
+		"_postman_id": "740c3792-06d5-4de8-a595-1f6ce3a8f6c1",
+		"name": "Schedule",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "43957298",
+		"_collection_link": "https://khrystynaursuliak.postman.co/workspace/Khrystyna-Ursuliak's-Workspace~868739a5-8fba-4d2d-87b9-bbc1ef6ff23e/collection/43957298-740c3792-06d5-4de8-a595-1f6ce3a8f6c1?action=share&source=collection_link&creator=43957298"
+	},
+	"item": [
+		{
+			"name": "Class Creation",
+			"item": [
+				{
+					"name": "create-lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", function () {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Your test name\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.subjectForSite).to.eql(pm.environment.get(\"newSubjectForSite\"));\r",
+									"});\r",
+									"\r",
+									"pm.environment.set(\"lessonId\", pm.response.json()[0].id);\r",
+									"console.log(pm.response.json()[0].id);\r",
+									"\r",
+									"pm.test(\"Teacher ID matches the sent value\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    const expectedTeacherId = parseInt(pm.environment.get(\"teacherId\"));\r",
+									"    const teacherId = json.teacher?.id || json[0]?.teacher?.id;\r",
+									"    pm.expect(teacherId).to.eql(expectedTeacherId);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"subjectForSite matches the expected value\", function () {\r",
+									"    const json = pm.response.json();\r",
+									"    const expected = pm.environment.get(\"subjectForSite\");\r",
+									"    pm.expect(json.subjectForSite || json[0]?.subjectForSite).to.eql(expected);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"grouped\": true, \r\n    \"groups\": [ \r\n        { \r\n            \"id\": {{groupId}}\r\n        } \r\n    ], \r\n    \"hours\": {{hours}}, \r\n    \"lessonType\": \"{{lessonType}}\", \r\n    \"linkToMeeting\": \"{{linkToMeeting}}\", \r\n    \"semesterId\": {{semesterId}}, \r\n    \"subject\": { \r\n        \"id\": {{subjectId}}\r\n    }, \r\n    \"subjectForSite\": \"{{subjectForSite}}\", \r\n    \"teacher\": { \r\n        \"id\": {{teacherId}}\r\n    }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-lesson (invalid teacherId)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Should return 400 for invalid teacherId\", function () {\r",
+									"    pm.response.to.have.status(400);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"grouped\": true,\r\n  \"groups\": [{ \"id\": {{groupId}} }],\r\n  \"hours\": {{hours}},\r\n  \"lessonType\": \"{{lessonType}}\",\r\n  \"linkToMeeting\": \"{{linkToMeeting}}\",\r\n  \"semesterId\": {{semesterId}},\r\n  \"subject\": { \"id\": {{subjectId}} },\r\n  \"subjectForSite\": \"{{subjectForSite}}\",\r\n  \"teacher\": { \"id\": \"notANumber\" }\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-lesson-by-id",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Lesson ID matches stored value\", function () {\r",
+									"    const expectedId = parseInt(pm.environment.get(\"lessonId\"));\r",
+									"    pm.expect(json.id).to.eql(expectedId);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Hours match expected value\", function () {\r",
+									"    const expectedHours = parseInt(pm.environment.get(\"hours\"));\r",
+									"    pm.expect(json.hours).to.eql(expectedHours);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"subjectForSite matches expected value\", function () {\r",
+									"    const expected = pm.environment.get(\"subjectForSite\");\r",
+									"    pm.expect(json.subjectForSite).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"lessonType matches expected value\", function () {\r",
+									"    const expected = pm.environment.get(\"lessonType\");\r",
+									"    pm.expect(json.lessonType).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"semesterId matches expected value\", function () {\r",
+									"    const expected = parseInt(pm.environment.get(\"semesterId\"));\r",
+									"    pm.expect(json.semesterId).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Teacher ID matches expected value\", function () {\r",
+									"    const expected = parseInt(pm.environment.get(\"teacherId\"));\r",
+									"    pm.expect(json.teacher.id).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Subject ID matches expected value\", function () {\r",
+									"    const expected = parseInt(pm.environment.get(\"subjectId\"));\r",
+									"    pm.expect(json.subject.id).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Group ID matches expected value\", function () {\r",
+									"    const expected = parseInt(pm.environment.get(\"groupId\"));\r",
+									"    pm.expect(json.group.id).to.eql(expected);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Grouped flag matches true\", function () {\r",
+									"    pm.expect(json.grouped).to.eql(true);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"linkToMeeting is correct\", function () {\r",
+									"    const expected = pm.environment.get(\"linkToMeeting\");\r",
+									"    const actual = json.linkToMeeting;\r",
+									"    if (expected === \"null\") {\r",
+									"        pm.expect(actual).to.eql(null);\r",
+									"    } else {\r",
+									"        pm.expect(actual).to.eql(expected);\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/lessons/{{lessonId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"{{lessonId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-lessons-by-teacher",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const lessons = pm.response.json();\r",
+									"\r",
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All lessons belong to the correct teacher\", function () {\r",
+									"    const expectedTeacherId = parseInt(pm.environment.get(\"teacherId\"));\r",
+									"    for (let lesson of lessons) {\r",
+									"        pm.expect(lesson.teacher.id).to.eql(expectedTeacherId);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Lesson structure is valid\", function () {\r",
+									"    const lesson = lessons[0];\r",
+									"    pm.expect(lesson).to.have.property(\"id\");\r",
+									"    pm.expect(lesson).to.have.property(\"hours\");\r",
+									"    pm.expect(lesson).to.have.property(\"lessonType\");\r",
+									"    pm.expect(lesson).to.have.property(\"subjectForSite\");\r",
+									"    pm.expect(lesson).to.have.property(\"subject\");\r",
+									"    pm.expect(lesson).to.have.property(\"teacher\");\r",
+									"    pm.expect(lesson).to.have.property(\"semesterId\");\r",
+									"    pm.expect(lesson).to.have.property(\"group\");\r",
+									"    pm.expect(lesson).to.have.property(\"grouped\");\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/lessons/teacher?teacherId={{teacherId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"teacher"
+							],
+							"query": [
+								{
+									"key": "teacherId",
+									"value": "{{teacherId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-lesson",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"group\": { \r\n        \"id\": {{groupId}}\r\n    }, \r\n    \"grouped\": true, \r\n    \"hours\": {{hours}}, \r\n    \"id\": {{lessonId}}, \r\n    \"lessonType\": \"{{lessonType}}\", \r\n    \"linkToMeeting\": \"{{linkToMeeting}}\", // https://meet.google.com/xmj-tbua-vdx\r\n    \"semesterId\": {{semesterId}}, \r\n    \"subject\": { \r\n        \"id\": {{subjectId}}\r\n    }, \r\n    \"subjectForSite\": \"{{subjectForSite}}\", \r\n    \"teacher\": { \r\n        \"id\": {{teacherId}}\r\n    }}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-lessons",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const lessons = pm.response.json();\r",
+									"\r",
+									"pm.test(\"All lessons are for correct group\", function () {\r",
+									"    const expectedGroupId = parseInt(pm.environment.get(\"groupId\"));\r",
+									"    for (let lesson of lessons) {\r",
+									"        pm.expect(lesson.group.id).to.eql(expectedGroupId);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All teachers have full names\", function () {\r",
+									"    for (let lesson of lessons) {\r",
+									"        const t = lesson.teacher;\r",
+									"        pm.expect(t.name).to.be.a(\"string\");\r",
+									"        pm.expect(t.surname).to.be.a(\"string\");\r",
+									"        pm.expect(t.patronymic).to.be.a(\"string\");\r",
+									"    }\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/lessons?{{groupId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons"
+							],
+							"query": [
+								{
+									"key": "{{groupId}}",
+									"value": null
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "copy-lesson-for-groups",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "[ \r\n    41\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons/copy-lesson-for-groups?lessonId={{lessonId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"copy-lesson-for-groups"
+							],
+							"query": [
+								{
+									"key": "lessonId",
+									"value": "{{lessonId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-groups-with-their-lessons-for-grouped-lesson",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons/all-groups-with-their-lessons-for-grouped-lesson/{{lessonId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"all-groups-with-their-lessons-for-grouped-lesson",
+								"{{lessonId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update-link",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"pm.globals.set(\"link\", \"http://localhost:8081/lessons/link\");\r",
+									"pm.globals.set(\"semesterId\", 57);\r",
+									"pm.globals.set(\"subjectId\", )"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{ \r\n    \"lessonType\": \"string\", \r\n    \"linkToMeeting\": {{link}}, \r\n    \"semesterId\": {{semesterId}}, \r\n    \"subjectId\": {{subjectId}}, \r\n    \"teacherId\": {{teacherId}}\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons/{{link}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"{{link}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "copy-lessons-from-one-semester-to-another",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// pm.globals.set(\"from_semester_id\", 1);\r",
+									"// pm.globals.set(\"to_semester_id\", 2);\r",
+									"\r",
+									"\r",
+									"// pm.test(\"Response is an array of lessons\", function () {\r",
+									"//     let jsonData = pm.response.json();\r",
+									"//     pm.expect(jsonData).to.be.an(\"array\");\r",
+									"//     if (jsonData.length > 0) {\r",
+									"//         const lesson = jsonData[0];\r",
+									"//         pm.expect(lesson).to.have.property(\"id\");\r",
+									"//         pm.expect(lesson).to.have.property(\"semester\");\r",
+									"//         pm.expect(lesson).to.have.property(\"subject\");\r",
+									"//         pm.expect(lesson).to.have.property(\"teacher\");\r",
+									"//     }\r",
+									"// });\r",
+									"\r",
+									"// pm.test(\"Response contains correct semester data\", function () {\r",
+									"//     const lessons = pm.response.json();\r",
+									"//     lessons.forEach(lesson => {\r",
+									"//         pm.expect(lesson.semesterId).to.eql(Number(pm.globals.get(\"to_semester_id\")));\r",
+									"//     });\r",
+									"// });\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:8081/lessons/copy-lessons?fromSemesterId={{semesterId}}&toSemesterId={{futureSemesterId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"copy-lessons"
+							],
+							"query": [
+								{
+									"key": "fromSemesterId",
+									"value": "{{semesterId}}"
+								},
+								{
+									"key": "toSemesterId",
+									"value": "{{futureSemesterId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get-all-lesson-types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// pm.test(\"Status code is 200\", function () {\r",
+									"//     pm.response.to.have.status(200);\r",
+									"// });\r",
+									"\r",
+									"// pm.test(\"Response is an array of lesson types\", function () {\r",
+									"//     const data = pm.response.json();\r",
+									"//     pm.expect(data).to.be.an(\"array\");\r",
+									"//     data.forEach(type => {\r",
+									"//         pm.expect(type).to.be.a(\"string\");\r",
+									"//     });\r",
+									"// });\r",
+									"\r",
+									"// pm.test(\"At least one lesson type is returned\", function () {\r",
+									"//     const data = pm.response.json();\r",
+									"//     pm.expect(data.length).to.be.greaterThan(0);\r",
+									"// });"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"packages": {},
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "accept",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/lessons/types",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"types"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete-lesson",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer_{{token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:8081/lessons/{{lessonId}}",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8081",
+							"path": [
+								"lessons",
+								"{{lessonId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							"pm.sendRequest({\r",
+							"    url: 'http://localhost:8081/auth/sign-in',\r",
+							"    method: 'POST',\r",
+							"    header: {\r",
+							"        'Content-Type': 'application/json'\r",
+							"    },\r",
+							"    body: {\r",
+							"        mode: 'raw',\r",
+							"        raw: JSON.stringify(\r",
+							"            {\r",
+							"                \"email\": \"new_manager@gmail.com\",\r",
+							"                \"password\": \"String!123\"\r",
+							"            }\r",
+							"        )\r",
+							"    },\r",
+							"    function (err, response) {\r",
+							"        if (err) {\r",
+							"            console.error(err);\r",
+							"        } else {\r",
+							"            pm.environment.set(\"token\", pm.response.json().token);\r",
+							"        }\r",
+							"    }\r",
+							"}\r",
+							")\r",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"packages": {},
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"pm.sendRequest({\r",
+					"    url: 'http://localhost:8081/auth/sign-in',\r",
+					"    method: 'POST',\r",
+					"    header: {\r",
+					"        'Content-Type': 'application/json'\r",
+					"    },\r",
+					"    body: {\r",
+					"        mode: 'raw',\r",
+					"        raw: JSON.stringify(\r",
+					"            {\r",
+					"                \"email\": \"new_manager@gmail.com\",\r",
+					"                \"password\": \"String!123\"\r",
+					"            }\r",
+					"        )\r",
+					"    },\r",
+					"    function (err, response) {\r",
+					"        if (err) {\r",
+					"            console.error(err);\r",
+					"        } else {\r",
+					"            pm.environment.set(\"token\", pm.response.json().token);\r",
+					"        }\r",
+					"    }\r",
+					"}\r",
+					")\r",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "newSubjectForSite",
+			"value": "\"3D графіка та моделювання\"",
+			"type": "string"
+		},
+		{
+			"key": "copyId1",
+			"value": ""
+		},
+		{
+			"key": "copyId2",
+			"value": ""
+		}
+	]
+}
