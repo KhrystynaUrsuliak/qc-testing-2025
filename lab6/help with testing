@@ -1,0 +1,16 @@
+1. access to lessons
+pytest venv/tests/test_lessons_access.py
+
+2. create group -> vidobrazhayetsya, edit group -> vidobrazhayetsya, delete group -> nema
+pytest venv/tests/test_lessons_ced.py
+
+3. group lesson -> create, edit and delete work for all groups mentioned
+pytest venv/tests/test_group_lessons_ced.py
+
+python -m playwright codegen -b chromium http://localhost:8081
+
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+.\venv\Scripts\activate
+
+new_manager@gmail.com
+String!123
